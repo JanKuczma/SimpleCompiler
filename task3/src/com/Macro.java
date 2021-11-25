@@ -1,5 +1,7 @@
 package com;
 
+import java.util.ArrayList;
+
 public enum Macro {
     // simply push integer val
     PushImm("""

@@ -42,7 +42,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         current_f = "main";
         visit(ctx.decs.get(0).block());
         for (int i = 0; i < Macro.values().length; i++) code += Macro.values()[i].instructions; // put the macros
-        for (int i = 0; i < code_list.size(); i++) code += code_list.get(i) + "\n"; // concat the instrs
+        code += String.join("\n",code_list);    // concat the instrs
         return code;    // return code
     }
 
@@ -61,7 +61,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         //activation record
         String previous = current_f; // needed to calc arg - FP offset
         current_f = ctx.identifier().Idfr().getText();
-		code_list.add("sw   ra, 0(sp)"); //<-- 4(sp)'old // push caller's ret address/space for ret val
+		code_list.add("sw   ra, 0(sp) #AR start"); //<-- 4(sp)'old // push caller's ret address/space for ret val
         code_list.add("addi sp, sp, -4");
         code_list.add("sw   sp, 0(sp)"); //<-- 4(FP)  // push the current SP
 		code_list.add("addi sp, sp, -4");
@@ -74,13 +74,13 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         code_list.add("addi fp, fp, " + (f_table.get(current_f).size()*(4)+4));
         // no variables can be declared except function parameters so no local vars
 
-        code_list.add("jal " +  ctx.identifier().Idfr().getText() + "_label"); // control link
+        code_list.add("jal " +  ctx.identifier().Idfr().getText() + "_label #AR finish"); // control link
 
         current_f=previous;
-        code_list.add("lw   sp, 4(fp)");    //restore SP
-        code_list.add("lw   ra, 4(sp)");    //restore caller's ra
-        code_list.add("sw   a0, 4(sp)");    //push the ret val (for 'unit' type it'll be just garbage)
-        code_list.add("lw   fp, 0(fp)");    //restore caller's FP
+        code_list.add("lw   sp, 4(fp) #restoring SP");    //restore SP
+        code_list.add("lw   ra, 4(sp) #restoring ra");    //restore caller's ra
+        code_list.add("sw   a0, 4(sp) #store ret val");    //push the ret val (for 'unit' type it'll be just garbage)
+        code_list.add("lw   fp, 0(fp) #restoring FP");    //restore caller's FP
         return "";
     }
 
@@ -165,7 +165,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         int offset = (-4*f_table.get(current_f).indexOf(ctx.identifier().Idfr().getText()))-4;
         //and then pop the value that is to be assigned and in place of old var val
         code_list.add(Macro.Pop.name() + " a0");
-        code_list.add("sw a0, " + offset + "(fp)");
+        code_list.add("sw a0, " + offset + "(fp) #store arg");
         return "";
     }
 
@@ -179,7 +179,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
     public String visitIdExpr(SExpressionsParser.IdExprContext ctx) {
         // similar to AsgmtExp except we get a "copy" of the variable
         int offset = (-4*f_table.get(current_f).indexOf(ctx.identifier().Idfr().getText()))-4;
-        code_list.add("lw a0, "+ offset +"(fp)");
+        code_list.add("lw a0, "+ offset +"(fp) #load arg");
         code_list.add(Macro.Push.name() + " a0");
         return "";
     }

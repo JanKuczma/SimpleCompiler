@@ -2,7 +2,7 @@
 echo ============================================
 echo Cleaning old builds... 
 echo(
-cmd /c "gradle -q clean & rd /s /q .gradle"
+cmd /c "gradlew -q clean & rd /s /q .gradlew"
 echo(
 echo Done.
 echo(
@@ -10,7 +10,7 @@ echo ============================================
 echo(
 echo Building the project...
 echo( 
-cmd /c "gradle -q build"
+cmd /c "gradlew -q build"
 echo(
 echo Done.
 echo(
@@ -24,7 +24,7 @@ echo ---------------------
 echo(
 echo Output:
 echo(
-cmd /c "type test1.sexp | gradle -q :task1:run | gradle -q task2:run | gradle -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+cmd /c "type test1.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
 echo(
 echo ============================================
 echo(
@@ -36,7 +36,7 @@ echo ---------------------
 echo(
 echo Output:
 echo(
-cmd /c "type test2.sexp | gradle -q :task1:run | gradle -q task2:run | gradle -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+cmd /c "type test2.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
 echo(
 echo ============================================
 echo(
@@ -48,7 +48,7 @@ echo ---------------------
 echo(
 echo Output:
 echo(
-cmd /c "type test3.sexp | gradle -q :task1:run | gradle -q task2:run | gradle -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+cmd /c "type test3.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
 echo(
 echo ============================================
 echo(
@@ -60,6 +60,6 @@ echo ---------------------
 echo(
 echo Output:
 echo(
-cmd /c "type test4.sexp | gradle -q :task1:run | gradle -q task2:run | gradle -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+cmd /c "type test4.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
 echo(
 echo ============================================
