@@ -7,10 +7,10 @@ import java.util.Map;
 public class CodeGen extends SExpressionsBaseVisitor<String>{
 
     private ArrayList<String> code_list = new ArrayList<>(); // for the code
-    private Map<String, SExpressionsParser.DecContext> fun_table = new HashMap<>(); //needed to know args relational positions
-    private SExpressionsParser.DecContext current_f = null; // needed in case of FunInvocation in fun declarations
-    private int label_no = 0; //after the first call of newLabel() it'll be incremented to 1
-                    // so the first label will be label_1
+    private Map<String, ArrayList<String>> f_table = new HashMap<>(); //needed to know args relational positions
+    private String current_f = "main"; // needed in case of FunInvocation in fun declarations
+    private int label_no = 0;   //after the first call of newLabel() it'll be incremented to 1
+                                // so the first label will be label_1
     private String newLabel(){
         label_no++;
         return "label_"+label_no;
@@ -21,16 +21,24 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         code_list.add(".text");
         String code = "";
         code_list.add("b main_label");
-        //generate code for fun decs
+        //we need to store information about no of
+        //declared params and their idfrs for each function
+        //so we can later calc the offsets to find the val of variable
+        //relative to position of FP
         for (int i = 1; i < ctx.decs.size(); i++) {
-            fun_table.put(ctx.decs.get(i).identifier().Idfr().getText(), ctx.decs.get(i));
+            f_table.put(ctx.decs.get(i).identifier().Idfr().getText(),new ArrayList<>());
+            for (int j = 0; j < ctx.decs.get(i).params.size(); j++) {
+                //f_table.get(current_f).add(nth_arg)
+                f_table.get(ctx.decs.get(i).identifier().Idfr().getText()).add(ctx.decs.get(i).params.get(j).identifier().Idfr().getText());
+            }
+
         }
         for (int i = 1; i < ctx.decs.size(); i++) {
             visit(ctx.decs.get(i));
         }
         //hop to main
         code_list.add("main_label: ");
-        current_f = ctx.decs.get(0);
+        current_f = "main";
         visit(ctx.decs.get(0).block());
         for (int i = 0; i < Macro.values().length; i++) code += Macro.values()[i].instructions; // put the macros
         for (int i = 0; i < code_list.size(); i++) code += code_list.get(i) + "\n"; // concat the instrs
@@ -39,8 +47,8 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
 
     @Override
     public String visitDec(SExpressionsParser.DecContext ctx) {
-        current_f = ctx;
-        code_list.add(ctx.identifier().Idfr().getText() + "_label:");// create label for the control link
+        current_f = ctx.identifier().Idfr().getText();
+        code_list.add(current_f + "_label:");// create label for the control link
             //the "Label" is added to avoid situation where someone defined function with name e.g. label_1
         visit(ctx.block());
         code_list.add("ret");
@@ -50,8 +58,8 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
     @Override
     public String visitFunInvocExpr(SExpressionsParser.FunInvocExprContext ctx) {
         //activation record
-        SExpressionsParser.DecContext previous = current_f; // needed to calc arg - FP offset
-        current_f = fun_table.get(ctx.identifier().Idfr().getText());
+        String previous = current_f; // needed to calc arg - FP offset
+        current_f = ctx.identifier().Idfr().getText();
 		code_list.add("sw   ra, 0(sp)"); //<-- 4(sp)'old // push caller's ret address/space for ret val
         code_list.add("addi sp, sp, -4");
         code_list.add("sw   sp, 0(sp)"); //<-- 4(FP)  // push the current SP
@@ -62,7 +70,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         //push the arguments
         visit(ctx.block());
         code_list.add("mv  fp,  sp");       //set new FP (current SP - no of args*4 +4)
-        code_list.add("addi fp, fp, " + (current_f.params.size()*(4)+4));
+        code_list.add("addi fp, fp, " + (f_table.get(current_f).size()*(4)+4));
         // no variables can be declared except function parameters so no local vars
 
         code_list.add("jal " +  ctx.identifier().Idfr().getText() + "_label"); // control link
@@ -152,12 +160,9 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
     @Override
     public String visitAsgmtExpr(SExpressionsParser.AsgmtExprContext ctx) {
         code_list.add(visit(ctx.expr())); // first visit the expression
-        int offset = 0;     //then calc the offset from the FP
-        for (int i = 0; i < current_f.params.size(); i++) {
-            if(ctx.identifier().Idfr().getText().equals(current_f.params.get(i).identifier().Idfr().getText()))
-                offset = (-4*i)-4;
-        }
-        //and then pop the value that is to be assigned and update the variable
+        //then calc the offset from the FP
+        int offset = (-4*f_table.get(current_f).indexOf(ctx.identifier().Idfr().getText()))-4;
+        //and then pop the value that is to be assigned and in place of old var val
         code_list.add(Macro.Pop.name() + " a0");
         code_list.add("sw a0, " + offset + "(fp)");
         return "";
@@ -171,11 +176,8 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
 
     @Override
     public String visitIdExpr(SExpressionsParser.IdExprContext ctx) {
-        int offset = 0; // similar to AsgmtExp except we get a "copy" of the variable
-        for (int i = 0; i < current_f.params.size(); i++) {     // and push it onto stack
-            if(ctx.identifier().Idfr().getText().equals(current_f.params.get(i).identifier().Idfr().getText()))
-            offset = (-4*i)-4;
-        }
+        // similar to AsgmtExp except we get a "copy" of the variable
+        int offset = (-4*f_table.get(current_f).indexOf(ctx.identifier().Idfr().getText()))-4;
         code_list.add("lw a0, "+ offset +"(fp)");
         code_list.add(Macro.Push.name() + " a0");
         return "";
