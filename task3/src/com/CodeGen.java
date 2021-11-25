@@ -6,7 +6,8 @@ import java.util.Map;
 
 public class CodeGen extends SExpressionsBaseVisitor<String>{
 
-    private ArrayList<String> code_list = new ArrayList<>(); // for the code
+    private ArrayList<String> code_list = new ArrayList<>(); // for the code to be concat at the end
+        // (fun_idfr : [list of arg idfrs]) pairs
     private Map<String, ArrayList<String>> f_table = new HashMap<>(); //needed to know args relational positions
     private String current_f = "main"; // needed in case of FunInvocation in fun declarations
     private int label_no = 0;   //after the first call of newLabel() it'll be incremented to 1
