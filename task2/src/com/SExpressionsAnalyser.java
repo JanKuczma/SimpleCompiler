@@ -9,7 +9,6 @@ import static com.Types.INT;
 
 public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 {
-
     private Map<String, SExpressionsParser.DecContext> global_funcs = new HashMap<>();
     private Map<String, Types> local_vars = new HashMap<>();
 
@@ -42,7 +41,6 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
     @Override public Types visitProg(SExpressionsParser.ProgContext ctx)
     {
 
-        // TODO: modify and complete this method.
 
         Boolean found_main = false;
 
@@ -196,12 +194,13 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitWhileExpr(SExpressionsParser.WhileExprContext ctx)
     {
-        // TODO: modify and complete this method.
         Types cond_t = visit(ctx.expr());
         Types block_t = visit(ctx.block());
+        // check if the loop condition has type BOOL
         if(!cond_t.equals(Types.BOOL)){
             throw new TypeException().conditionError(ctx,ctx.expr(),cond_t);
         }
+        //check if the loop's type is UNIT, e.i. last exp in the loopbody
         if(!block_t.equals(Types.UNIT)){
             throw new TypeException().loopBodyError(ctx,ctx.block(),block_t);
         }
@@ -211,14 +210,15 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitRepeatExpr(SExpressionsParser.RepeatExprContext ctx)
     {
-        // TODO: modify and complete this method.
         Types cond_t = visit(ctx.expr());
         Types block_t = visit(ctx.block());
-        if(!block_t.equals(Types.UNIT)){
-            throw new TypeException().loopBodyError(ctx,ctx.block(),block_t);
-        }
+        // check if the loop condition has type BOOL
         if(!cond_t.equals(Types.BOOL)){
             throw new TypeException().conditionError(ctx,ctx.expr(),cond_t);
+        }
+        //check if the loop's type is UNIT, e.i. last exp in the loopbody
+        if(!block_t.equals(Types.UNIT)){
+            throw new TypeException().loopBodyError(ctx,ctx.block(),block_t);
         }
 
         return Types.UNIT;
@@ -226,7 +226,6 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitAsgmtExpr(SExpressionsParser.AsgmtExprContext ctx)
     {
-        // TODO: modify and complete this method.
         SExpressionsParser.ExprContext right = ctx.expr();
         SExpressionsParser.IdentifierContext left = ctx.identifier();
         //check if variable was declared
@@ -244,7 +243,6 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitFunInvocExpr(SExpressionsParser.FunInvocExprContext ctx)
     {
-        // TODO: modify and complete this method.
         Types f_type;
         //check if the function was defined
         if(!global_funcs.containsKey(ctx.identifier().Idfr().toString())){
@@ -270,13 +268,13 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitBlockExpr(SExpressionsParser.BlockExprContext ctx)
     {
-        // TODO: modify and complete this method.
+        //just visit the block
         return visit(ctx.block());
     }
 
     @Override public Types visitIdExpr(SExpressionsParser.IdExprContext ctx)
     {
-        // TODO: modify and complete this method.
+        // check if variable was declared (i.e. passed as argument)
         if(!local_vars.containsKey(ctx.identifier().Idfr().getText())){
             throw new TypeException().undeclaredVarError(current_dec,ctx.identifier(),Types.UNKNOWN);
         }

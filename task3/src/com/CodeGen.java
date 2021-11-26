@@ -22,14 +22,14 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         code_list.add(".text");
         String code = "";
         code_list.add("b main_label");
-        //we need to store information about no of
-        //declared params and their idfrs for each function
-        //so we can later calc the offsets to find the val of variable
-        //relative to position of FP
+        //We need to store information about no of
+        //declared params and their idfrs for each function,
+        //so we can later calc the offsets to find the val of variables
+        //relative to position of FP.
         for (int i = 1; i < ctx.decs.size(); i++) {
             f_table.put(ctx.decs.get(i).identifier().Idfr().getText(),new ArrayList<>());
             for (int j = 0; j < ctx.decs.get(i).params.size(); j++) {
-                //f_table.get(current_f).add(nth_arg)
+                //f_table.get(ith).add(jth_arg)
                 f_table.get(ctx.decs.get(i).identifier().Idfr().getText()).add(ctx.decs.get(i).params.get(j).identifier().Idfr().getText());
             }
 

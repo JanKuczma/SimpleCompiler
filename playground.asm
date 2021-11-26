@@ -97,35 +97,19 @@ bgtz a0, %label
 .end_macro
 .text
 b main_label
-fact_label:
+fun_label:
 lw a0, -4(fp) #load arg
 Push a0
-PushImm 0
+lw a0, -8(fp) #load arg
+Push a0
 EqMacro
 JumpMacro label_1
-lw a0, -4(fp) #load arg
-Push a0
-sw   ra, 0(sp) #AR start
-addi sp, sp, -4
-sw   sp, 0(sp)
-addi sp, sp, -4
-sw   fp, 0(sp)
-addi sp, sp, -4
-lw a0, -4(fp) #load arg
-Push a0
-PushImm 1
-MinusMacro
-mv  fp,  sp
-addi fp, fp, 8
-jal fact_label #AR finish
-lw   sp, 4(fp) #restoring SP
-lw   ra, 4(sp) #restoring ra
-sw   a0, 4(sp) #store ret val
-lw   fp, 0(fp) #restoring FP
-TimesMacro
+PushImm 0
 b label_2
 label_1:
-PushImm 1
+PushImm 8
+PushImm 2
+DivMacro
 label_2:
 ret
 main_label:
@@ -135,10 +119,12 @@ sw   sp, 0(sp)
 addi sp, sp, -4
 sw   fp, 0(sp)
 addi sp, sp, -4
-PushImm 10
+PushImm 1
+PushImm 1
+PushImm 3
 mv  fp,  sp
-addi fp, fp, 8
-jal fact_label #AR finish
+addi fp, fp, 16
+jal fun_label #AR finish
 lw   sp, 4(fp) #restoring SP
 lw   ra, 4(sp) #restoring ra
 sw   a0, 4(sp) #store ret val
