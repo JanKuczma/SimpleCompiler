@@ -56,7 +56,7 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
                 }
                 //check if "main" has no params
                 if(dec.params.size() != 0){
-                    throw new TypeException().mainFuncError(dec,dec.params.get(0).identifier(),
+                    throw new TypeException().mainFuncError(dec,dec.params.get(0),
                             Types.toType(dec.params.get(0).type()));
                 }
             }
@@ -93,14 +93,15 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
             }
             //check param type (only INT and BOOL allowed so no UNIT)
             if(Types.toType(param_type) == Types.UNIT){
-                throw new TypeException().unitVarError(ctx,id,Types.toType(type));
+                throw new TypeException().unitVarError(ctx,param_id,Types.toType(param_type));
             }
             local_vars.put(param_id.Idfr().getText(),Types.toType(param_type));
         }
         //visit function body, check type of the block == function type
         Types final_exp_type = visit(ctx.block());
         if(!final_exp_type.equals(Types.toType(type))){
-            throw new TypeException().functionBodyError(ctx,ctx.block(),final_exp_type);
+            throw new TypeException().functionBodyError(ctx,
+                    ctx.block().expr(ctx.block().expr().size()-1),final_exp_type);
         }
         //clear local vars from environment (symbol table)
         //so next fun_dec will have clear env
@@ -142,7 +143,9 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
         }
         //check if both blocks have the same type
         if(!block1_t.equals(block2_t)){
-            throw new TypeException().branchMismatchError(ctx,ctx.block(0),block1_t,ctx.block(1),block2_t);
+            throw new TypeException().branchMismatchError(ctx,
+                    ctx.block(0).expr(ctx.block(0).expr().size()-1),block1_t,
+                    ctx.block(1).expr(ctx.block(1).expr().size()-1),block2_t);
         }
         return block1_t;
     }
@@ -202,7 +205,8 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
         }
         //check if the loop's type is UNIT, e.i. last exp in the loopbody
         if(!block_t.equals(Types.UNIT)){
-            throw new TypeException().loopBodyError(ctx,ctx.block(),block_t);
+            throw new TypeException().loopBodyError(ctx,
+                    ctx.block().expr(ctx.block().expr().size()-1),block_t);
         }
 
         return Types.UNIT;
@@ -218,7 +222,8 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
         }
         //check if the loop's type is UNIT, e.i. last exp in the loopbody
         if(!block_t.equals(Types.UNIT)){
-            throw new TypeException().loopBodyError(ctx,ctx.block(),block_t);
+            throw new TypeException().loopBodyError(ctx,
+                    ctx.block().expr(ctx.block().expr().size()-1),block_t);
         }
 
         return Types.UNIT;
@@ -236,7 +241,7 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
         Types right_t = visit(right);
         //check if types match
         if(!left_t.equals(right_t)){
-            throw new TypeException().assignmentError(ctx,right,right_t,left,left_t);
+            throw new TypeException().assignmentError(ctx,left,left_t,right,right_t);
         }
         return Types.UNIT;
     }
