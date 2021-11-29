@@ -63,3 +63,39 @@ echo(
 cmd /c "type test4.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
 echo(
 echo ============================================
+echo(
+echo Input program:
+echo(
+type test5.sexp
+echo(
+echo ---------------------
+echo(
+echo Output:
+echo(
+cmd /c "type test5.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+echo(
+echo ============================================
+echo(
+echo Input program:
+echo(
+type test6.sexp
+echo(
+echo ---------------------
+echo(
+echo Output:
+echo(
+cmd /c "type test6.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+echo(
+echo ============================================
+echo(
+echo Input program:
+echo(
+type test7.sexp
+echo(
+echo ---------------------
+echo(
+echo Output:
+echo(
+cmd /c "type test7.sexp | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+echo(
+echo ============================================

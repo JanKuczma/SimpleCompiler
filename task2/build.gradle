@@ -1,28 +1,22 @@
 plugins {
     id 'java'
-    id 'antlr'
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
     implementation files ('../antlr-4.9.2-complete.jar')
-    antlr 'org.antlr:antlr4:4.9.2'
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
 
 task run(type: JavaExec) {
-    sourceSets.main.java.srcDirs = ['src']
     classpath = sourceSets.main.runtimeClasspath
-    mainClass.set('com.Task2')
+    mainClass = 'com.Task2'
     standardInput = System.in
     // standardOutput defaults to System.out.
 }
-
-test {
-    useJUnitPlatform()
-}
-sourceCompatibility = JavaVersion.VERSION_14
-targetCompatibility = JavaVersion.VERSION_14

@@ -154,6 +154,9 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         code_list.add(r_loop+":");
         visit(ctx.block());
         visit(ctx.expr());
+        code_list.add(Macro.Pop.name() + " a0");
+        code_list.add("seqz a0, a0"); // negate the condition
+        code_list.add(Macro.Push.name() + " a0");
         code_list.add(Macro.Jump.name() + "Macro " + r_loop);
         return "";
     }
