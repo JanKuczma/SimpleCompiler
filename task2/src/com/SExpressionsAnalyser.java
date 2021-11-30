@@ -17,7 +17,6 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     public String visitAndPrint(SExpressionsParser.ProgContext prog)
     {
-
         visit(prog);    // Discards the dummy return value.
 
         // At this point, we know for sure that there is at least a 'main' function.
@@ -80,9 +79,7 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitDec(SExpressionsParser.DecContext ctx)
     {
-        // TODO: modify and complete this method.
         current_dec = ctx;
-        SExpressionsParser.IdentifierContext id = ctx.identifier();
         SExpressionsParser.TypeContext type = ctx.type();
         for (int i = 0; i < ctx.params.size();i++) {
             SExpressionsParser.IdentifierContext param_id = ctx.params.get(i).identifier();
@@ -121,8 +118,7 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitBlock(SExpressionsParser.BlockContext ctx)
     {
-        // TODO: modify and complete this method.
-        //a block may have no expressions so defautl is UNIT
+        //a block may have no expressions so default is UNIT
         Types final_exp_type = Types.UNIT;
         for (int i = 0; i < ctx.exprs.size(); i++) {
             final_exp_type = visit(ctx.exprs.get(i));
@@ -133,7 +129,6 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitIfExpr(SExpressionsParser.IfExprContext ctx)
     {
-        // TODO: modify and complete this method.
         Types cond_t = visit(ctx.expr());
         Types block1_t = visit(ctx.block(0));
         Types block2_t = visit(ctx.block(1));
@@ -152,8 +147,6 @@ public class SExpressionsAnalyser extends SExpressionsBaseVisitor<Types>
 
     @Override public Types visitBinExpr(SExpressionsParser.BinExprContext ctx)
     {
-        // TODO: modify and complete this method.
-
         SExpressionsParser.ExprContext operand1 = ctx.expr(0);
         SExpressionsParser.ExprContext operand2 = ctx.expr(1);
         Types operand1_t = visit(operand1);

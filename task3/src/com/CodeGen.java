@@ -61,7 +61,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         //activation record
         String previous = current_f; // needed to calc arg - FP offset
         current_f = ctx.identifier().Idfr().getText();
-		code_list.add("sw   ra, 0(sp) #AR start"); //<-- 4(sp)'old // push caller's ret address/space for ret val
+		code_list.add("sw   ra, 0(sp) #AR start"); //<-- 4(sp'old) // push caller's ret address/space for ret val
         code_list.add("addi sp, sp, -4");
         code_list.add("sw   sp, 0(sp)"); //<-- 4(FP)  // push the current SP
 		code_list.add("addi sp, sp, -4");
@@ -79,7 +79,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
         current_f=previous;
         code_list.add("lw   sp, 4(fp) #restoring SP");    //restore SP
         code_list.add("lw   ra, 4(sp) #restoring ra");    //restore caller's ra
-        code_list.add("sw   a0, 4(sp) #store ret val");    //push the ret val (for 'unit' type it'll be just garbage)
+        code_list.add("sw   a0, 4(sp) #store ret val");   //push the ret val (for 'unit' type it'll be just garbage)
         code_list.add("lw   fp, 0(fp) #restoring FP");    //restore caller's FP
         return "";
     }
@@ -196,7 +196,7 @@ public class CodeGen extends SExpressionsBaseVisitor<String>{
 
     @Override
     public String visitSkipExpr(SExpressionsParser.SkipExprContext ctx) {
-        // just ignore skip
+        code_list.add("nop"); // NOP
         return "";
     }
 
