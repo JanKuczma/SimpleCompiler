@@ -111,3 +111,15 @@ echo(
 cmd /c "type test8.in | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
 echo(
 echo ============================================
+echo(
+echo Input program:
+echo(
+type test9.in
+echo(
+echo ---------------------
+echo(
+echo Output:
+echo(
+cmd /c "type test9.in | gradlew -q :task1:run | gradlew -q task2:run | gradlew -q task3:run | java -classpath .\rars_46ab74d.jar .\task3/src/com/RARSInterface.java"
+echo(
+echo ============================================
